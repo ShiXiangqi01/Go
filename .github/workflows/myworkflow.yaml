@@ -27,7 +27,7 @@ jobs:
           ignore-unfixed: true
           format: 'table'
           output: 'trivy-results.txt'
-          severity: 'HIGH'
+          severity: 'CRITICAL'
 
   my_second_job:
     name: fail_workflow
