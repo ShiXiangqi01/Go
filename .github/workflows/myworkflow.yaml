@@ -44,6 +44,10 @@ jobs:
             echo "No HIGH vulnerabilities found."
             echo "::set-output name=found_vuln::false"
           fi
+      - name: Set job output
+        id: set_output
+        run: echo "::set-output name=found_vuln::${{ steps.check_vuln.outputs.found_vuln }}"
+
       - name: notify on Slack if vulnerabilities found
         if: steps.check_vuln.outputs.found_vuln == 'true'
         uses: slackapi/slack-github-action@v1.14.0
@@ -80,7 +84,7 @@ jobs:
     name: success workflow
     needs: [my_first_job, my_second_job]
     runs-on: ubuntu-latest
-    if: ${{ needs.my_second_job.outputs.found_vuln == 'false' || !steps.check_vuln.outputs.found_vuln}}
+    if: ${{ needs.my_second_job.outputs.found_vuln == 'false'}}
     
     steps:
       - name: Install Cosign
