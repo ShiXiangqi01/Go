@@ -38,8 +38,10 @@ jobs:
         id: check_vuln
         run: |
           if grep -q "HIGH" trivy-results.txt; then
+            echo "Found HIGH vulnerabilities."
             echo "::set-output name=found_vuln::true"
           else
+            echo "No HIGH vulnerabilities found."
             echo "::set-output name=found_vuln::false"
           fi
       - name: notify on Slack if vulnerabilities found
