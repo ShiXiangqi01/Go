@@ -30,49 +30,49 @@ jobs:
           severity: 'CRITICAL'
 
   my_second_job:
-  name: fail_workflow
-  needs: my_first_job
-  runs-on: ubuntu-latest
-  steps:
-    - name: Check for vulnerabilities
-      id: check_vuln
-      run: |
-        if grep -q "HIGH" trivy-results.txt; then
-          echo "::set-output name=found_vuln::true"
-        else
-          echo "::set-output name=found_vuln::false"
-        fi
-    - name: notify on Slack if vulnerabilities found
-      if: steps.check_vuln.outputs.found_vuln == 'true'
-      uses: slackapi/slack-github-action@v1.14.0
-      with:
-        slack-webhook-url: ${{ secrets.SLACK_WEBHOOK }}
-        payload: |
-          {
-            "text": "Scan failed - Critical vulnerabilities found!",
-            "attachments": [
-              {
-                "title": "Failed trivy scan, see uploaded report",
-                "color": "#FF0000",
-                "fields": [
-                  {
-                    "title": "Total High/Critical Issues",
-                    "value": "4 HIGH, 0 CRITICAL",
-                    "short": true
-                  }
-                ],
-                "footer": "CI/CD Pipeline | Scan Report"
-              }
-            ]
-          }
-    - name: Upload file
-      if: steps.check_vuln.outputs.found_vuln == 'true'
-      uses: MeilCli/slack-upload-file@v4
-      with:
-        slack_token: ${{ secrets.SLACK_TOKEN }}
-        channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
-        file_path: 'trivy-results.txt'
-        initial_comment: 'post by slack-upload-file'
+    name: fail_workflow
+    needs: my_first_job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for vulnerabilities
+        id: check_vuln
+        run: |
+          if grep -q "HIGH" trivy-results.txt; then
+            echo "::set-output name=found_vuln::true"
+          else
+            echo "::set-output name=found_vuln::false"
+          fi
+      - name: notify on Slack if vulnerabilities found
+        if: steps.check_vuln.outputs.found_vuln == 'true'
+        uses: slackapi/slack-github-action@v1.14.0
+        with:
+          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK }}
+          payload: |
+            {
+              "text": "Scan failed - Critical vulnerabilities found!",
+              "attachments": [
+                {
+                  "title": "Failed trivy scan, see uploaded report",
+                  "color": "#FF0000",
+                  "fields": [
+                    {
+                      "title": "Total High/Critical Issues",
+                      "value": "4 HIGH, 0 CRITICAL",
+                      "short": true
+                    }
+                  ],
+                  "footer": "CI/CD Pipeline | Scan Report"
+                }
+              ]
+            }
+      - name: Upload file
+        if: steps.check_vuln.outputs.found_vuln == 'true'
+        uses: MeilCli/slack-upload-file@v4
+        with:
+          slack_token: ${{ secrets.SLACK_TOKEN }}
+          channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
+          file_path: 'trivy-results.txt'
+          initial_comment: 'post by slack-upload-file'
 
   my_third_job:
     name: success workflow
