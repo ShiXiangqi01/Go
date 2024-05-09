@@ -34,10 +34,12 @@ jobs:
     needs: my_first_job
     runs-on: ubuntu-latest
     steps:
-      - name: notify on Slack if vulnerabilities found
-        uses: slackapi/slack-github-action@v1.14.0
+      - uses: actions/checkout@v2
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         with:
-          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK }}
           payload: |
             {
               "text": "Scan failed - Critical vulnerabilities found!",
@@ -56,6 +58,7 @@ jobs:
                 }
               ]
             }
+
       - name: Upload file
         uses: MeilCli/slack-upload-file@v4
         with:
