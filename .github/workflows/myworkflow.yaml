@@ -19,27 +19,63 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v2
 
-      - name: Run Trivy vulnerability scanner in repo mode
-        id: trivy_scan
+      - name: Vulnerability Scan with Trivy
         uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          ignore-unfixed: true
+        with:                             
+          scan-type: 'filesystem'
+          scan-dir: '.'
           format: 'table'
-          output: 'trivy-results.txt'
+          fail-on: 'CRITICAL'
+          ignore-unfixed: true
           severity: 'CRITICAL'
+          output: 'trivy-results.txt'
 
-      - name: Upload Trivy scan results as artifact
-        uses: actions/upload-artifact@v2
+     
+
+  my_second_job:
+    name: fail_workflow
+    needs: my_first_job
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         with:
-          name: trivy-results
-          path: trivy-results.txt
+          payload: |
+            {
+              "text": "Scan failed - Critical vulnerabilities found!",
+              "attachments": [
+                {
+                  "title": "Failed trivy scan, see uploaded report",
+                  "color": "#FF0000",
+                  "fields": [
+                    {
+                      "title": "Total High/Critical Issues",
+                      "value": "4 HIGH, 0 CRITICAL",
+                      "short": true
+                    }
+                  ],
+                  "footer": "CI/CD Pipeline | Scan Report"
+                }
+              ]
+            }
 
-  my_third_job:
+      - name: Upload file
+        uses: adrey/slack-file-upload-action@master
+        with:
+          slack-bot-token: ${{ secrets.SLACK_TOKEN }}
+          file-path: trivy-results.txt
+          channels: ${{ secrets.SLACK_CHANNEL_ID }}
+
+   my_third_job:
     name: success workflow
     needs: my_first_job
     runs-on: ubuntu-latest
-    if: ${{ needs.my_first_job.result == 'success' }}
+    if: success()
     steps:
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3.5.0
@@ -111,6 +147,5 @@ jobs:
                   ]
                 }
               ]
-            }   
-
-  
+            }
+ 
