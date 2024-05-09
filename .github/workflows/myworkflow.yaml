@@ -28,6 +28,7 @@ jobs:
           format: 'table'
           output: 'trivy-results.txt'
           severity: 'HIGH'
+          exit-code: '1'
 
   my_second_job:
     name: fail_workflow
@@ -142,5 +143,3 @@ jobs:
                 }
               ]
             }
-
-            
