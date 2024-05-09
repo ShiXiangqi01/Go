@@ -76,9 +76,10 @@ jobs:
 
   my_third_job:
     name: success workflow
-    needs: my_first_job
-    if: ${{ needs.my_first_job.result == 'success' }}
+    needs: [my_first_job, my_second_job]
     runs-on: ubuntu-latest
+    if: ${{ needs.my_second_job.outputs.found_vuln == 'false' }}
+    
     steps:
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3.5.0
