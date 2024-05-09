@@ -30,10 +30,6 @@ jobs:
     #if: ${{ failure() }}  # Correct conditional to capture failure from the first job
     runs-on: ubuntu-latest
     steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: trivy-results
 
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
