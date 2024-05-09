@@ -33,7 +33,7 @@ jobs:
   my_second_job:
     name: fail_workflow
     needs: my_first_job
-    if: ${{ needs.my_first_job.result == 'failure' }}
+    if: fail()
     runs-on: ubuntu-latest
     steps:
       - name: notify on Slack if vulnerabilities found
