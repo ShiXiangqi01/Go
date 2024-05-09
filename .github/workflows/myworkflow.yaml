@@ -20,12 +20,12 @@ jobs:
           scan-type: 'fs'  # Corrected to 'fs' for filesystem scanning
           ignore-unfixed: true
           format: 'table'
-          fail-on: 'CRITICAL'
-          severity: 'CRITICAL'
+          fail-on: 'HIGH'
+          severity: 'HIGH'
           output: 'trivy-results.txt'
 
   my_second_job:
-    name: Handle Failure
+    name: fail workflow
     needs: my_first_job
     if: ${{ failure() }}  # Correct conditional to capture failure from the first job
     runs-on: ubuntu-latest
