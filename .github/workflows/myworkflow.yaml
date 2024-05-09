@@ -27,29 +27,16 @@ jobs:
           ignore-unfixed: true
           format: 'table'
           output: 'trivy-results.txt'
-          severity: 'CRITICAL'
+          severity: 'HIGH'
+          exit-code: '1'
 
   my_second_job:
     name: fail_workflow
     needs: my_first_job
     runs-on: ubuntu-latest
+    if: ${{ needs.my_first_job.result == 'failure' }}
     steps:
-      - name: Check for vulnerabilities
-        id: check_vuln
-        run: |
-          if grep -q "HIGH" trivy-results.txt; then
-            echo "Found HIGH vulnerabilities."
-            echo "::set-output name=found_vuln::true"
-          else
-            echo "No HIGH vulnerabilities found."
-            echo "::set-output name=found_vuln::false"
-          fi
-      - name: Set job output
-        id: set_output
-        run: echo "::set-output name=found_vuln::${{ steps.check_vuln.outputs.found_vuln }}"
-
       - name: notify on Slack if vulnerabilities found
-        if: steps.check_vuln.outputs.found_vuln == 'true'
         uses: slackapi/slack-github-action@v1.14.0
         with:
           slack-webhook-url: ${{ secrets.SLACK_WEBHOOK }}
@@ -72,7 +59,6 @@ jobs:
               ]
             }
       - name: Upload file
-        if: steps.check_vuln.outputs.found_vuln == 'true'
         uses: MeilCli/slack-upload-file@v4
         with:
           slack_token: ${{ secrets.SLACK_TOKEN }}
@@ -82,10 +68,9 @@ jobs:
 
   my_third_job:
     name: success workflow
-    needs: [my_first_job, my_second_job]
+    needs: my_first_job
     runs-on: ubuntu-latest
-    if: ${{ needs.my_second_job.outputs.found_vuln == 'false'}}
-    
+    if: ${{ needs.my_first_job.result == 'success' }}
     steps:
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3.5.0
