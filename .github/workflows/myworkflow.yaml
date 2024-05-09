@@ -29,11 +29,26 @@ jobs:
           output: 'trivy-results.txt'
           severity: 'HIGH'
 
+      - name: Upload Trivy scan results as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: trivy-results
+          path: trivy-results.txt
+
+      
+
   my_second_job:
     name: fail_workflow
     needs: my_first_job
     runs-on: ubuntu-latest
     steps:
+
+      - uses: actions/checkout@v2
+      - name: Download Trivy scan results
+        uses: actions/download-artifact@v2
+        with:
+          name: trivy-results
+          
       - uses: actions/checkout@v2
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
