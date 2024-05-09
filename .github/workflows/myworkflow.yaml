@@ -80,7 +80,7 @@ jobs:
     name: success workflow
     needs: [my_first_job, my_second_job]
     runs-on: ubuntu-latest
-    if: ${{ needs.my_second_job.outputs.found_vuln == 'false' }}
+    if: ${{ needs.my_second_job.outputs.found_vuln == 'false' || !steps.check_vuln.outputs.found_vuln}}
     
     steps:
       - name: Install Cosign
