@@ -27,7 +27,7 @@ jobs:
   my_second_job:
     name: fail workflow
     needs: my_first_job
-    if: ${{ failure() }}  # Correct conditional to capture failure from the first job
+    #if: ${{ failure() }}  # Correct conditional to capture failure from the first job
     runs-on: ubuntu-latest
     steps:
       - name: Download Artifact
