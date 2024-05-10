@@ -3,7 +3,6 @@ name: Test Workflow
 on:
   push:
     branches:
-      - master
 
 jobs:
   my_first_job:
@@ -63,71 +62,4 @@ jobs:
           file_path: trivy-results.txt
           initial_comment: 'Post by slack-upload-file'
 
-  my_third_job:
-    name: Success Workflow
-    needs: my_first_job
-    if: ${{ success() }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install Cosign
-        uses: sigstore/cosign-installer@v3.5.0
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v3  # Correct the version if v5 is intended
-        with:
-          context: .
-          push: true
-          tags: shixiangqi/workshop-image:${{ github.sha }}
-
-      - name: Sign Docker image with Cosign
-        run: cosign sign --key ${{ secrets.COSIGN_PRIVATE_KEY }} shixiangqi/workshop-image:${{ github.sha }}
-        env:
-          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
-          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-
-      - name: Notify Slack on Success
-        uses: slackapi/slack-github-action@v1.14.0
-        with:
-          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK }}
-          payload: |
-            {
-              "text": "CICD Pipeline Execution Report",
-              "blocks": [
-                {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": "Build and Deployment Success",
-                    "emoji": true
-                  }
-                },
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Name:*\nFred"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Matriculation:*\nabc123"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Email:*\nfred@gmail.com"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Git Repository:*\n<https://github.com/ShiX
+  
